@@ -6,8 +6,9 @@
     <div class="row">
         <div class="col-sm-12 col-md-6 col-md-push-6">
 
-            <div class="alert alert-info">Please enter meeting request details in the form and select one or multiple dates
-                using the calendar widget.</div>
+            <div class="alert alert-info">
+                Please enter meeting request details in the form and optionally
+                select one or multiple dates using the calendar widget.</div>
 
             <div class="form-group">
                 <label for="meeting-name" class="col-sm-3 control-label">Name</label>
