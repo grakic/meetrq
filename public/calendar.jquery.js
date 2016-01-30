@@ -15,6 +15,12 @@
         "December"
     );
 
+    function dateFormat(date) {
+        var m = date.getMonth()+1;
+        var d = date.getDate();
+        return date.getFullYear() + '-' + (m < 10 ? '0'+m : m) + '-' + (d < 10 ? '0'+d : d);
+    }
+
     $.fn.calendar = function(year, month, minDate, meetings, inputName) {
         var calendar = this;
 
@@ -56,7 +62,7 @@
 
                 if (curr.getMonth() == month) {
                     var n = $("<div>");
-                    var v = curr.toISOString().slice(0, 10);
+                    var v = dateFormat(curr);
                     n.attr('id', 'calendar-date-' + v);
                     n.addClass('calendar-date');
                     n.addClass('calendar-month-' + (curr.getMonth()));
@@ -72,9 +78,8 @@
                     else
                         n.addClass('enabled');
 
-                    if (!(v in meetings)) {
+                    if (v in meetings)
                         n.addClass('calendar-date-filled');
-                    }
 
                     n.on('click', function(e) {
                         e.preventDefault();
