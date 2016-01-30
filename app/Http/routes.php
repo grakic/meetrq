@@ -22,11 +22,9 @@
 | kernel and includes session state, CSRF protection, and more.
 |
 */
-
 Route::group(['middleware' => ['web']], function () {
 
-    Route::get('/', function () {
-        return view('welcome');
-    });
+    Route::get('/', 'ScheduleController@index');
+    Route::post('/meeting', 'ScheduleController@store');
 
 });
