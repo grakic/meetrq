@@ -66,7 +66,7 @@
     @parent
 <script src="/calendar.jquery.js"></script>
 <script>
-    var meetings = [];
+    var meetings = {!! json_encode($dates) !!};
     $("#calendar").calendar(null, null, null, meetings, 'date');
 </script>
 @stop

@@ -30,6 +30,7 @@ h1 {
     font-size: large;
     margin: 3px;
     display: block;
+    position: relative;
 }
 
 .calendar-date.enabled {
@@ -51,6 +52,23 @@ h1 {
 .calendar-date.disabled {
     background: #eee;
     color: #ccc;
+}
+
+.calendar-date-filled {
+    color: #ccc;
+}
+
+.calendar-date-count {
+    position: absolute;
+    bottom: 2px;
+    left: 2px;
+    width: 20px;
+    height: 20px;
+    border-radius: 15px;
+    font-size: x-small;
+    text-align: center;
+    line-height: 20px;
+    background: #f3f3f3;
 }
 
 .calendar-prevbtn {
