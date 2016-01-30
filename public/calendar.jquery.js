@@ -32,14 +32,53 @@
         calendar.year = year;
         calendar.month = month;
         calendar.minDate = minDate;
-        calendar.meetings = meetings;
-        calendar.selected = new Array();
         calendar.inputName = inputName;
+
+        var requests = new Array();
 
         var prevBtn = $('<a class="btn btn-default calendar-prevbtn"><</a>');
         var monthLbl = $('<span class="calendar-monthlbl"></span>');
         var yearLbl = $('<span class="calendar-yearlbl"></span>');
         var nextBtn = $('<a class="btn btn-default calendar-nextbtn">></a>');
+
+        function refreshCount(n, count) {
+            if (count == 0) {
+                $(".calendar-date-count", n).remove();
+                var date = n.data('date');
+                delete meetings[date];
+            } else {
+                var c = $('.calendar-date-count', n);
+                if (c.length == 0) {
+                    var c = $('<div>');
+                    c.addClass('calendar-date-count');
+                    n.append(c);
+                }
+                c.text(count);
+            }
+        }
+
+        function delRequestDate(n, v) {
+            n.removeClass('calendar-date-selected');
+            requests.splice($.inArray(v, requests), 1 );
+            $('#' + calendar.inputName + '-' + v).remove();
+
+            refreshCount(n, --meetings[v]);
+        }
+
+        function addRequestDate(n, v) {
+            n.addClass('calendar-date-selected');
+            requests.push(v);
+
+            if (!(v in meetings))
+                meetings[v] = 0;
+            refreshCount(n, ++meetings[v]);
+
+            var input = $("<input type='hidden' name='"+ calendar.inputName +"[]'/>");
+            input.attr('id', calendar.inputName + '-' + v);
+            input.val(v);
+
+            calendar.append(input);
+        }
 
         this.showMonth = function (year, month) {
             var firstDay = new Date(year, month, 1);
@@ -78,31 +117,24 @@
                     else
                         n.addClass('enabled');
 
-                    if (v in meetings)
+                    if (v in meetings) {
                         n.addClass('calendar-date-filled');
+                        refreshCount(n, meetings[v]);
+                    }
+
+                    if ($.inArray(v, requests) != -1)
+                        n.addClass('calendar-date-selected');
 
                     n.on('click', function(e) {
                         e.preventDefault();
 
                         var n = $(this);
                         var v = $(this).data('date');
-                        var i = $.inArray(v, calendar.selected);
-                        var inputId = calendar.inputName + '-' + v;
 
-                        if (i == -1) {
-                            n.addClass('calendar-date-selected');
-                            calendar.selected.push(v);
-
-                            var input = $("<input type='hidden' name='"+ calendar.inputName +"[]'/>");
-                            input.attr('id', inputId);
-                            input.val(v);
-                            calendar.append(input);
-
-                        } else {
-                            n.removeClass('calendar-date-selected');
-                            calendar.selected.splice(i, 1 );
-                            $("#"+inputId).remove();
-                        }
+                        if ($.inArray(v, requests) == -1)
+                            addRequestDate(n, v);
+                        else
+                            delRequestDate(n, v)
 
                     });
 
