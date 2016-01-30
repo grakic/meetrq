@@ -2,7 +2,7 @@
     "name": "devbase/meetrq",
     "description": "Meeting request form",
     "minimum-stability": "stable",
-    "license": "proprietary",
+    "license": "MIT",
     "authors": [
         {
             "name": "Goran Rakic",
