@@ -27,7 +27,6 @@ when working with Laravel and it should be readable to a skilled professional.
 Install PHP and node.js dependencies:
 
     composer install
-    npm install
 
 Copy .env.example to .env and customize:
 
@@ -54,4 +53,4 @@ If running in production environment, enable optimizations:
 
 Run PHPUnit tests with:
 
-    gulp phpUnit
+    php vendor/bin/phpunit
