@@ -48,8 +48,8 @@ If running in production environment, enable optimizations:
 ### Unit tests
 
 - Framework smoketest (auto-generated)
-- Implemented:
-- Planned:
+- ScheduleRepository: store method input mapping
+- Planned: ScheduleRepository countAdvanceByDate and getAdvanceByDate methods
 
 Run PHPUnit tests with:
 

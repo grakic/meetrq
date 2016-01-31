@@ -3,10 +3,11 @@ namespace App\Repositories;
 
 use DB;
 use App\Meeting;
+use Illuminate\Support\Facades\App;
 
 class ScheduleRepository
 {
-   /**
+    /**
     * Get meeting counts for all dates in advance.
     *
     * Return as meeting counts in a sorted associative array indexed by date.
@@ -75,7 +76,7 @@ class ScheduleRepository
 
     public function storeRequest($request)
     {
-        $this->store($request->name, $request->email, $request->message, $request->datetimes);
+        $this->store($request->name, $request->email, $request->note, $request->datetimes);
     }
 
     /**
@@ -83,10 +84,10 @@ class ScheduleRepository
      *
      * @param $name
      * @param $email
-     * @param $message
+     * @param string $note
      * @param array|null $datetimes
      */
-    public function store($name, $email, $note, $datetimes)
+    public function store($name, $email, $note = '', $datetimes = null)
     {
         $data = compact('name', 'email', 'note');
 
@@ -101,6 +102,7 @@ class ScheduleRepository
             }, $datetimes);
         }
 
-        Meeting::insert($data);
+        $meeting = App::make('App\Meeting');
+        $meeting->insert($data);
     }
 }
