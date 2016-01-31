@@ -74,17 +74,17 @@
                     if (t == minSlot)
                         minSlotOptionIndex = i;
                 }
-
-                console.log(meetings[v], t);
                 if(v in meetings && $.inArray(t, meetings[v]) != -1)
                     option.prop('disabled', true);
-
             }
-            if (minSlotOptionIndex != -1)
-                $(options[minSlotOptionIndex+1]).prop('selected', true);
-            else
-                $(options[0]).prop('selected', true);
 
+            for (var i = 0; i < options.length; i++) {
+                var option = $(options[i]);
+                if (option.prop('disabled') == false) {
+                    option.prop('selected', true);
+                    break;
+                }
+            }
 
             var offset = n.position();
             timepicker.css({
