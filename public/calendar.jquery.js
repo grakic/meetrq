@@ -44,13 +44,23 @@
         return (h < 10 ? "0" + h : h) + ":" + (m <= 30 ? "00" : "30");
     }
 
-    $.fn.calendar = function(timepicker, meetings, inputName) {
+    $.fn.calendar = function(timepicker, meetings, inputName, datetimes) {
         var calendar = this;
 
+        var inputs = calendar.parent();
         calendar.inputName = inputName;
 
+        var requestDates = new Array();
         var requests = new Array();
-        var inputs = calendar.parent();
+
+        // keep old input
+        $(datetimes).each(function (k, d) {
+            var x = d.split(' ');
+            var v = x[0];
+            var t = x[1];
+
+            addRequestDateTimeImpl(v, t);
+        });
 
         var prevBtn = $('<a class="btn btn-default calendar-prevbtn"><</a>');
         var monthLbl = $('<span class="calendar-monthlbl"></span>');
@@ -141,22 +151,32 @@
         }
 
         function delRequestDateTime(n, v, t) {
-            n.removeClass('calendar-date-selected');
-            requests.splice($.inArray(v, requests), 1 );
-            $('#' + requestInputId(v, t)).remove();
 
+            requests[v].splice($.inArray(t, requests[v]), 1);
+            if (requests[v].length == 0) {
+                requestDates.splice($.inArray(v, requestDates), 1);
+                n.removeClass('calendar-date-selected');
+            }
+
+            meetings[v].splice($.inArray(t, meetings[v]), 1);
+
+            $('#' + requestInputId(v, t)).remove();
             refreshCount(n, meetings[v].length);
         }
 
-        function addRequestDateTime(n, v, t) {
-            n.addClass('calendar-date-selected');
-            requests.push(v);
+        function addRequestDateTimeImpl(v, t) {
+            if ($.inArray(v, requestDates) == -1)
+                requestDates.push(v);
+
+            if (!(v in requests))
+                requests[v] = new Array();
+            if ($.inArray(t, requests[v]) == -1)
+                requests[v].push(t);
 
             if (!(v in meetings))
                 meetings[v] = new Array();
-            meetings[v].push(t);
-
-            refreshCount(n, meetings[v].length);
+            if ($.inArray(t, meetings[v]) == -1)
+                meetings[v].push(t);
 
             var input = $("<input type='text' name='"+ calendar.inputName +"[]' readonly />");
             input.addClass('calendar-input');
@@ -164,6 +184,12 @@
             input.val(v + " " + t);
 
             inputs.append(input);
+        }
+
+        function addRequestDateTime(n, v, t) {
+            n.addClass('calendar-date-selected');
+            addRequestDateTimeImpl(v, t);
+            refreshCount(n, meetings[v].length);
         }
 
         this.showMonth = function (year, month) {
@@ -209,7 +235,7 @@
                         refreshCount(n, meetings[v].length);
                     }
 
-                    if ($.inArray(v, requests) != -1)
+                    if ($.inArray(v, requestDates) != -1)
                         n.addClass('calendar-date-selected');
 
                     n.on('click', function(e) {

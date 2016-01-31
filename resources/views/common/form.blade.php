@@ -13,21 +13,21 @@
             <div class="form-group">
                 <label for="meeting-name" class="col-sm-3 control-label">Name</label>
                 <div class="col-sm-6">
-                    <input type="text" name="name" id="meeting-name" class="form-control">
+                    <input type="text" name="name" id="meeting-name" class="form-control" value="{{ old('name') }}">
                 </div>
             </div>
 
             <div class="form-group">
                 <label for="meeting-email" class="col-sm-3 control-label">Email</label>
                 <div class="col-sm-6">
-                    <input type="text" name="email" id="meeting-email" class="form-control">
+                    <input type="text" name="email" id="meeting-email" class="form-control" value="{{ old('email') }}">
                 </div>
             </div>
 
             <div class="form-group">
                 <label for="meeting-note" class="col-sm-3 control-label">Note</label>
                 <div class="col-sm-6">
-                    <textarea name="note" id="meeting-note" rows="5" class="form-control" ></textarea>
+                    <textarea name="note" id="meeting-note" rows="5" class="form-control" >{{ old('note') }}</textarea>
                 </div>
             </div>
 
@@ -80,6 +80,11 @@
 <script src="/calendar.jquery.js"></script>
 <script>
     var meetings = {!! json_encode($meetings) !!};
-    $("#calendar").calendar($("#timepicker"), meetings, 'datetimes');
+@if (old('datetimes'))
+    var datetimes = {!! json_encode(old('datetimes')) !!};
+@else
+    var datetimes = new Array();
+@endif
+    $("#calendar").calendar($("#timepicker"), meetings, 'datetimes', datetimes);
 </script>
 @stop

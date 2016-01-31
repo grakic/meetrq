@@ -16,9 +16,9 @@
     </tr>
 @endif
     <tr>
-        <th>Meeting times:</th>
+        <th>Times:</th>
         <td>
-            @if (count($datetimes) > 0)
+            @if (isset($datetimes))
                 {{ join(', ', $datetimes) }}
             @else
                 No dates specified
