@@ -158,7 +158,7 @@
 
             refreshCount(n, meetings[v].length);
 
-            var input = $("<input type='text' name='"+ calendar.inputName +"[]'/>");
+            var input = $("<input type='text' name='"+ calendar.inputName +"[]' readonly />");
             input.addClass('calendar-input');
             input.attr('id', requestInputId(v, t));
             input.val(v + " " + t);
