@@ -21,25 +21,104 @@
         return date.getFullYear() + '-' + (m < 10 ? '0'+m : m) + '-' + (d < 10 ? '0'+d : d);
     }
 
-    $.fn.calendar = function(year, month, minDate, meetings, inputName) {
+    function getMinDate() {
+        var now = new Date;
+        var d = now.getUTCDate();
+        var m = now.getUTCMonth();
+        var y = now.getUTCFullYear();
+        return new Date(y, m, d);
+    }
+
+    function getMinSlot(date) {
+        var now = new Date();
+        var d = now.getUTCDate();
+        var m = now.getUTCMonth() + 1;
+        var y = now.getUTCFullYear();
+
+        var nowDate = y + '-' + (m<10 ? '0'+m : m) + '-' + (d<10 ? '0'+d : d);
+        if (date != nowDate)
+            return -1;
+
+        var h = now.getUTCHours();
+        var m = now.getUTCMinutes();
+        return (h < 10 ? "0" + h : h) + ":" + (m <= 30 ? "00" : "30");
+    }
+
+    $.fn.calendar = function(timepicker, meetings, inputName) {
         var calendar = this;
 
-        var today = new Date;
-        if (year == null) year = today.getFullYear();
-        if (month == null) month = today.getMonth();
-        if (minDate == null) minDate = today;
-
-        calendar.year = year;
-        calendar.month = month;
-        calendar.minDate = minDate;
         calendar.inputName = inputName;
 
         var requests = new Array();
+        var inputs = calendar.parent();
 
         var prevBtn = $('<a class="btn btn-default calendar-prevbtn"><</a>');
         var monthLbl = $('<span class="calendar-monthlbl"></span>');
         var yearLbl = $('<span class="calendar-yearlbl"></span>');
         var nextBtn = $('<a class="btn btn-default calendar-nextbtn">></a>');
+
+        function showTimePicker(n, v) {
+            if(!timepicker)
+                addRequestDateTime(n, v, "00:00");
+
+            var options = $("option", timepicker);
+            options.prop('disabled', false);
+
+            var minSlot = getMinSlot(v);
+            var minSlotOptionIndex = -1;
+            for (var i = 0; i < options.length; i++) {
+                var option = $(options[i]);
+                var t = option.val();
+                if(minSlot != -1 && minSlotOptionIndex == -1) {
+                    option.prop('disabled', true);
+                    if (t == minSlot)
+                        minSlotOptionIndex = i;
+                }
+
+                console.log(meetings[v], t);
+                if(v in meetings && $.inArray(t, meetings[v]) != -1)
+                    option.prop('disabled', true);
+
+            }
+            if (minSlotOptionIndex != -1)
+                $(options[minSlotOptionIndex+1]).prop('selected', true);
+            else
+                $(options[0]).prop('selected', true);
+
+
+            var offset = n.position();
+            timepicker.css({
+                display: 'block',
+                position: 'absolute',
+                zIndex: 9000,
+                top: offset.top,
+                left: offset.left,
+                height: n.outerHeight()+6,
+                width: n.outerWidth()+6
+            });
+            timepicker.focus();
+            timepicker.data('n', n);
+            timepicker.data('v', v);
+        }
+
+        $("input", timepicker).on('click', function() {
+            var slot = $("select", timepicker).val();
+            var n = timepicker.data('n');
+            var v = timepicker.data('v');
+            addRequestDateTime(n, v, slot);
+            timepicker.css('display', 'none');
+        });
+
+        // play as modal
+        if (timepicker) {
+            $('html').on('click', function () {
+                if (timepicker.css('display') == 'block')
+                    timepicker.css('display', 'none');
+            });
+            $(timepicker).on('click', function (e) {
+                e.stopPropagation();
+            });
+        }
 
         function refreshCount(n, count) {
             if (count == 0) {
@@ -57,40 +136,48 @@
             }
         }
 
-        function delRequestDate(n, v) {
-            n.removeClass('calendar-date-selected');
-            requests.splice($.inArray(v, requests), 1 );
-            $('#' + calendar.inputName + '-' + v).remove();
-
-            refreshCount(n, --meetings[v]);
+        function requestInputId(v, t) {
+            return calendar.inputName + '-' + v + '_' + t.replace(':', '-');
         }
 
-        function addRequestDate(n, v) {
+        function delRequestDateTime(n, v, t) {
+            n.removeClass('calendar-date-selected');
+            requests.splice($.inArray(v, requests), 1 );
+            $('#' + requestInputId(v, t)).remove();
+
+            refreshCount(n, meetings[v].length);
+        }
+
+        function addRequestDateTime(n, v, t) {
             n.addClass('calendar-date-selected');
             requests.push(v);
 
             if (!(v in meetings))
-                meetings[v] = 0;
-            refreshCount(n, ++meetings[v]);
+                meetings[v] = new Array();
+            meetings[v].push(t);
 
-            var input = $("<input type='hidden' name='"+ calendar.inputName +"[]'/>");
-            input.attr('id', calendar.inputName + '-' + v);
-            input.val(v);
+            refreshCount(n, meetings[v].length);
 
-            calendar.append(input);
+            var input = $("<input type='text' name='"+ calendar.inputName +"[]'/>");
+            input.addClass('calendar-input');
+            input.attr('id', requestInputId(v, t));
+            input.val(v + " " + t);
+
+            inputs.append(input);
         }
 
         this.showMonth = function (year, month) {
+            var minDate = getMinDate();
             var firstDay = new Date(year, month, 1);
             var monthOffset = firstDay.getDay() - 1;
-            firstDay = new Date(year, month, -monthOffset);
-
-            var lastDay = new Date(year, month + 1, 0);
 
             if (minDate < firstDay)
                 prevBtn.removeClass('disabled');
             else
                 prevBtn.addClass('disabled');
+
+            firstDay = new Date(year, month, -monthOffset);
+            var lastDay = new Date(year, month + 1, 0);
 
             calendar.days.empty();
             var week = $("<tr>");
@@ -119,7 +206,7 @@
 
                     if (v in meetings) {
                         n.addClass('calendar-date-filled');
-                        refreshCount(n, meetings[v]);
+                        refreshCount(n, meetings[v].length);
                     }
 
                     if ($.inArray(v, requests) != -1)
@@ -127,15 +214,13 @@
 
                     n.on('click', function(e) {
                         e.preventDefault();
+                        e.stopPropagation();
 
                         var n = $(this);
-                        var v = $(this).data('date');
-
-                        if ($.inArray(v, requests) == -1)
-                            addRequestDate(n, v);
-                        else
-                            delRequestDate(n, v)
-
+                        if (n.hasClass('enabled')) {
+                            var v = $(this).data('date');
+                            showTimePicker(n, v);
+                        }
                     });
 
                     d.append(n);
@@ -202,6 +287,7 @@
         table.append(this.days);
         this.append(table);
 
-        this.showMonth(year, month);
+        var today = new Date;
+        this.showMonth(today.getFullYear(), today.getMonth());
     }
 }( jQuery ));

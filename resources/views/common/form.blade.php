@@ -42,7 +42,19 @@
         </div>
 
         <div class="col-sm-12 col-md-6 col-md-pull-6">
+
+            <div id="timepicker">
+                <select>
+                    @foreach (range(0, 23) as $h)
+                        <option value="{{ $h < 10 ? "0".$h : $h }}:00">{{ $h < 10 ? "0".$h : $h }}:00</option>
+                        <option value="{{ $h < 10 ? "0".$h : $h }}:30">{{ $h < 10 ? "0".$h : $h }}:30</option>
+                    @endforeach
+                </select>
+                <input type="button" value="Pick">
+            </div>
+
             <div id="calendar"></div>
+
         </div>
 
     </div>
@@ -67,7 +79,7 @@
     @parent
 <script src="/calendar.jquery.js"></script>
 <script>
-    var meetings = {!! json_encode($dates) !!};
-    $("#calendar").calendar(null, null, null, meetings, 'date');
+    var meetings = {!! json_encode($meetings) !!};
+    $("#calendar").calendar($("#timepicker"), meetings, 'datetimes');
 </script>
 @stop

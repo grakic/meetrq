@@ -33,7 +33,7 @@ class ScheduleController extends Controller
     public function index()
     {
         return view('welcome', [
-            'dates' => $this->schedule->countAdvanceByDate()
+            'meetings' => $this->schedule->getAdvanceByDate()
         ]);
     }
 
@@ -48,8 +48,8 @@ class ScheduleController extends Controller
         $this->validate($request, [
             'name' => 'required|max:255',
             'email' => 'required|email',
-            'date' => 'array',
-            'date.*' => 'date_format:Y-n-j|after:yesterday'
+            'datetimes' => 'array',
+            'datetimes.*' => 'date_format:Y-m-d H:i|after:now'
         ]);
 
         Mail::send('emails.meeting', $request->toArray(), function($m) {
