@@ -3,6 +3,10 @@ h1 {
     margin-bottom: 30px;
 }
 
+.container {
+    padding-bottom: 30px;
+}
+
 #calendar {
     border: 1px solid #ccc;
     border-radius: 5px;
@@ -93,10 +97,16 @@ h1 {
 }
 
 .calendar-input {
-    border: none;
     background: none;
     width: 120px;
     color: #ccc;
+    border-radius: 3px;
+    border: 1px #efefef solid;
+    padding: 2px;
+    font-size: small;
+    text-align: center;
+    margin-right: 3px;
+    margin-top: 2px;
 }
 
 #timepicker option[disabled] {
